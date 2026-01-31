@@ -1,0 +1,68 @@
+<!--
+================================================================================
+| AUTOR: M.Sc. Christian Kitzel, Hochschule Düsseldorf (HSD)                   |
+| LIZENZ: Proprietär - Siehe LICENSE.md für Details                            |
+| Copyright (c) 2025 M.Sc. Christian Kitzel, Hochschule Düsseldorf             |
+================================================================================
+-->
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title>WLAN Konfiguration</title>
+</head>
+<body>
+    <div class="section">
+        <h2><i class="fas fa-wifi"></i> WLAN Konfiguration</h2>
+        <div class="grid-container">
+            
+            <!-- Karte für die aktuellen Verbindungsdaten -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-info-circle"></i>
+                    <h3>Aktueller Status</h3>
+                </div>
+                <!-- Diese Werte werden vom ESP32 ersetzt -->
+                <p><strong>Hostname:</strong> %HOSTNAME%</p>
+                <p><strong>Modus:</strong> %MODE%</p>
+                <p><strong>IP Adresse:</strong> %IP%</p>
+                <p><strong>Verbundenes Netz:</strong> %SSID%</p>
+            </div>
+
+            <!-- Karte für das Eingabeformular -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-keyboard"></i>
+                    <h3>Neues Netzwerk verbinden</h3>
+                </div>
+                <!-- Das Formular sendet die Daten an den ESP32 -->
+                <form action="/save" method="GET" onsubmit="showStatus()">
+                    <div class="form-group">
+                        <label for="ssid_input">Netzwerkname (SSID)</label>
+                        <input type="text" id="ssid_input" name="ssid" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Passwort</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                    <button type="submit" class="button">Verbinden & Speichern</button>
+                </form>
+                <p id="status-message" style="text-align: center; margin-top: 15px; color: var(--warning-color); display: none;">
+                    Daten werden gespeichert. Das Gerät startet neu... Verbinden Sie sich erneut mit dem Access-Point um die Heimnetz-IP herauszufinden.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Diese kleine Funktion zeigt eine Statusmeldung an, wenn das Formular abgeschickt wird.
+        function showStatus() {
+            document.getElementById('status-message').style.display = 'block';
+        }
+    </script>
+ <iframe id="main-navbar" src="navbar.html" style="position: fixed; bottom: 0; left: 0; width: 100%; border: none; z-index: 1000; display: block;"></iframe></body>
+</html>

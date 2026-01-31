@@ -1,0 +1,265 @@
+/*
+================================================================================
+| AUTOR: M.Sc. Christian Kitzel, Hochschule Düsseldorf (HSD)                   |
+| LIZENZ: Proprietär - Siehe LICENSE.md für Details                            |
+| Copyright (c) 2025 M.Sc. Christian Kitzel, Hochschule Düsseldorf             |
+================================================================================
+*/
+
+
+/*
+================================================================================
+|                                                                              |
+|                      ZENTRALE STILVORLAGE (STYLESHEET)                         |
+|                      FÜR DAS ESP32 WEB INTERFACE                             |
+|                                                                              |
+================================================================================
+| BESCHREIBUNG:                                                                 |
+| Diese Datei definiert das gesamte visuelle Erscheinungsbild aller HTML-Seiten|
+| des Projekts. Durch die Auslagerung des Stils in eine zentrale Datei wird    |
+| das Design konsistent gehalten und die Wartung erheblich vereinfacht.        |
+| Änderungen an dieser einen Datei wirken sich auf alle Seiten aus.            |
+--------------------------------------------------------------------------------
+*/
+
+
+/*
+--------------------------------------------------------------------------------
+| TEIL 1: GLOBALE VARIABLEN UND BASIS-SETUP (`:root` und `body`)               |
+--------------------------------------------------------------------------------
+| ZWECK:                                                                       |
+| Hier definieren wir das Fundament unseres Designs. CSS-Variablen (`--name`)  |
+| erlauben es uns, Werte wie Farben an einer einzigen Stelle zu definieren und |
+| im gesamten Dokument wiederzuverwenden. Das macht Design-Änderungen trivial. |
+| Im `body`-Selektor legen wir grundlegende Eigenschaften wie Schriftart,      |
+| Hintergrund und Textfarbe für die gesamte Seite fest.                        |
+--------------------------------------------------------------------------------
+*/
+
+:root {
+    /* -- FARBPALETTE -- */
+    /* Hier werden alle Farben zentral definiert. Ändere einen Wert hier, und die Farbe ändert sich überall. */
+    --background-color: #2c2c2c;                      /* Dunkelgrauer Hintergrund der Seite */
+    --primary-color: #00bfff;                         /* Helles Blau als Haupt-Akzentfarbe (für Rahmen, Icons, etc.) */
+    --danger-color: #dc3545;                          /* Rot für Warnungen oder Lösch-Buttons */
+    --success-color: #28a745;                         /* Grün für Erfolgsmeldungen */
+    --warning-color: #ffc107;                         /* Gelb für Hinweise */
+    --info-color: #17a2b8;                            /* alternatives Blau für Info-Elemente */
+
+    /* -- TEXTFARBEN -- */
+    --text-color: #f0f0f0;                            /* Helles Grau für den Haupttext, gut lesbar auf dunklem Grund */
+    --text-color-muted: #a0a0a0;                      /* Gedämpftes Grau für untergeordnete Texte (z.B. Labels) */
+
+    /* -- LAYOUT-FARBEN (mit Transparenz) -- */
+    /* `rgba()` erlaubt die Angabe eines Alpha-Kanals für Transparenz (0.0 = voll transparent, 1.0 = voll deckend) */
+    --tile-background: rgba(0, 0, 0, 0.6);            /* Schwarzer Hintergrund für Sektionen mit 40% Transparenz */
+    --card-background: rgba(255, 255, 255, 0.05);      /* Sehr dezenter, fast unsichtbarer weißer Hintergrund für Karten */
+    --border-color: rgba(255, 255, 255, 0.1);         /* Kaum sichtbarer weißer Rahmen für einen subtilen 3D-Effekt */
+    --input-background: rgba(255, 255, 255, 0.1);     /* Leicht weißer Hintergrund für Eingabefelder */
+}
+
+body {
+    /* -- SCHRIFT UND TEXT -- */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; /* Moderne, serifenlose Systemschriftarten */
+    font-size: 16px;                                  /* Standard-Schriftgröße für gute Lesbarkeit */
+    color: var(--text-color);                         /* Anwendung der globalen Textfarbe */
+
+    /* -- HINTERGRUND -- */
+    background-color: var(--background-color);        /* Fallback-Farbe, falls das Bild nicht lädt */
+    background-image: url('https://reefmanager.eu/Bilder/IoT_wallpaper.jpg'); /* Externes Hintergrundbild */
+    background-size: cover;                           /* Stellt sicher, dass das Bild immer den gesamten Bildschirm ausfüllt, ohne sich zu verzerren */
+    background-position: center;                      /* Zentriert das Bild */
+    background-attachment: fixed;                     /* Das Hintergrundbild scrollt nicht mit dem Inhalt mit (Parallax-Effekt) */
+
+    /* -- LAYOUT UND ABSTÄNDE -- */
+    margin: 0;                                        /* Entfernt den Standard-Außenabstand des Browsers */
+    padding: 20px;                                    /* Fügt einen Innenabstand hinzu, damit der Inhalt nicht am Rand klebt */
+    padding-bottom: 135px;                            /* WICHTIG: Lässt am unteren Rand Platz für eine fixierte Navigationsleiste */
+}
+
+
+/*
+--------------------------------------------------------------------------------
+| TEIL 2: HAUPT-LAYOUT-ELEMENTE (`.section`, `h2`, `.grid-container`)          |
+--------------------------------------------------------------------------------
+| ZWECK:                                                                       |
+| Diese Stile definieren die grobe Struktur der Seite. `.section` ist der      |
+| Hauptcontainer für unseren Inhalt, und `.grid-container` sorgt für ein      |
+| flexibles, responsives Layout der Karten.                                    |
+--------------------------------------------------------------------------------
+*/
+
+.section {
+    background: var(--tile-background);               /* Transparenter schwarzer Hintergrund (Glassmorphism-Effekt) */
+    border-radius: 15px;                              /* Abgerundete Ecken für ein weicheres Aussehen */
+    padding: 20px 30px;                               /* Innenabstand (oben/unten 20px, links/rechts 30px) */
+    margin-bottom: 20px;                              /* Abstand zur nächsten Sektion */
+    border: 1px solid var(--border-color);            /* Subtiler heller Rahmen, der das Licht zu reflektieren scheint */
+}
+
+h2 {
+    font-size: 24px;                                  /* Größere Schrift für die Hauptüberschrift */
+    margin-top: 0;                                    /* Entfernt den oberen Abstand */
+    color: var(--text-color);                         /* Standard-Textfarbe */
+    border-bottom: 1px solid rgba(0, 191, 255, 0.5);  /* Eine feine, halbtransparente blaue Linie unter der Überschrift */
+    padding-bottom: 10px;                             /* Abstand zwischen Text und unterer Linie */
+    margin-bottom: 20px;                              /* Abstand zum nachfolgenden Inhalt */
+    display: flex;                                    /* Ermöglicht die vertikale Ausrichtung von Text und Icon */
+    align-items: center;                              /* Zentriert Text und Icon auf der vertikalen Achse */
+    gap: 15px;                                        /* Fügt einen Abstand zwischen dem Icon (falls vorhanden) und dem Text hinzu */
+}
+
+.grid-container {
+    display: grid;                                    /* Aktiviert das CSS Grid Layout, das mächtigste Layout-System in CSS */
+    /* Definiert die Spalten: Der Browser erstellt so viele Spalten wie möglich, die mindestens 350px breit sind.
+       `auto-fit` sorgt dafür, dass bei mehr Platz die Spalten wachsen, anstatt leeren Raum zu lassen.
+       `1fr` bedeutet, dass jede Spalte den gleichen Anteil am verfügbaren Platz einnimmt.
+       Dies ist der Schlüssel für ein vollautomatisches, responsives Design. */
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;                                        /* Definiert den Abstand zwischen den einzelnen Grid-Elementen (den Karten) */
+}
+
+
+/*
+--------------------------------------------------------------------------------
+| TEIL 3: KARTEN-DESIGN (`.card`, `.card-header`)                              |
+--------------------------------------------------------------------------------
+| ZWECK:                                                                       |
+| Karten sind die primären Inhaltscontainer innerhalb des Grids. Sie fassen    |
+| zusammengehörige Informationen visuell zusammen.                             |
+--------------------------------------------------------------------------------
+*/
+
+.card {
+    background: var(--card-background);               /* Sehr transparenter weißer Hintergrund */
+    border-radius: 10px;                              /* Etwas weniger abgerundete Ecken als die Sektion */
+    padding: 25px;                                    /* Innenabstand für den Inhalt der Karte */
+    border: 1px solid var(--border-color);            /* Derselbe subtile Rahmen wie bei der Sektion */
+    display: flex;                                    /* Aktiviert Flexbox für das Layout innerhalb der Karte */
+    flex-direction: column;                           /* Ordnet die Elemente in der Karte (Header, Inhalt, Button) untereinander an */
+}
+
+.card-header {
+    display: flex;                                    /* Nutzt Flexbox für die Ausrichtung von Icon und Titel */
+    align-items: center;                              /* Zentriert Icon und Titel vertikal */
+    margin-bottom: 20px;                              /* Abstand zum Inhalt der Karte */
+}
+
+.card-header i { /* Stil für Font-Awesome-Icons (`<i class="fas fa-...">`) */
+    font-size: 24px;
+    color: var(--primary-color);                      /* Akzentfarbe für das Icon */
+    margin-right: 15px;                               /* Abstand zum Titel */
+    width: 30px;                                      /* Feste Breite, damit alle Titel bündig beginnen */
+    text-align: center;                               /* Zentriert das Icon innerhalb seiner festen Breite */
+}
+
+.card-header h3 {
+    margin: 0;
+    font-size: 20px;
+    color: var(--primary-color);                      /* Akzentfarbe für den Titel der Karte */
+}
+
+
+/*
+--------------------------------------------------------------------------------
+| TEIL 4: FORMULAR-ELEMENTE (`.form-group`, `input`, `.button`)                |
+--------------------------------------------------------------------------------
+| ZWECK:                                                                       |
+| Definiert das Aussehen von Eingabefeldern, Labels und Buttons, um eine       |
+| konsistente und benutzerfreundliche Interaktion zu gewährleisten.            |
+--------------------------------------------------------------------------------
+*/
+
+.form-group {
+    margin-bottom: 20px;                              /* Abstand zwischen den einzelnen Formularfeldern */
+}
+
+.form-group label {
+    display: block;                                   /* Das Label nimmt die volle Breite ein und rückt das Input-Feld in die nächste Zeile */
+    margin-bottom: 8px;                               /* Kleiner Abstand zum zugehörigen Eingabefeld */
+    font-weight: 600;                                 /* Etwas fettere Schrift */
+    color: var(--text-color-muted);                   /* Gedämpfte Farbe, um es vom normalen Text abzuheben */
+}
+
+.form-group input {
+    width: 100%;                                      /* Das Eingabefeld füllt die gesamte Breite des Elternelements aus */
+    padding: 12px 15px;                               /* Innenabstand für den Text im Feld */
+    background: var(--input-background);              /* Leicht transparenter Hintergrund */
+    border: 1px solid var(--border-color);            /* Subtiler Rahmen */
+    border-radius: 8px;                               /* Abgerundete Ecken */
+    color: var(--text-color);                         /* Textfarbe für die Eingabe */
+    font-size: 1em;                                   /* Gleiche Schriftgröße wie der restliche Text */
+    box-sizing: border-box;                           /* WICHTIG: Verhindert, dass Padding und Border die Gesamtbreite des Elements vergrößern */
+    transition: border-color 0.3s, box-shadow 0.3s;   /* Sanfter Übergang für den Fokus-Effekt */
+}
+
+.form-group input:focus { /* Stil, wenn das Eingabefeld angeklickt wird */
+    outline: none;                                    /* Entfernt den standardmäßigen, oft unschönen Fokus-Rahmen des Browsers */
+    border-color: var(--primary-color);               /* Der Rahmen färbt sich in der Akzentfarbe */
+    box-shadow: 0 0 0 3px rgba(0, 191, 255, 0.3);      /* Fügt einen sanften, leuchtenden Schatten hinzu, um den Fokus zu verdeutlichen */
+}
+
+.button {
+    display: inline-block;
+    width: 100%;
+    padding: 12px 15px;
+    border-radius: 8px;
+    background-color: rgba(0, 0, 0, 0.4);             /* Schwarz mit 60% Transparenz */
+    color: #fff;
+    cursor: pointer;                                  /* Ändert den Mauszeiger zu einer Hand, um Klickbarkeit zu signalisieren */
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    border: 2px solid var(--primary-color);           /* 2px dicker, blauer Rahmen */
+    transition: all 0.3s ease;                        /* Sanfter Übergang für alle Änderungen (Hintergrund, Rahmen, Schatten) */
+    box-sizing: border-box;
+}
+
+.button:hover { /* Stil, wenn die Maus über dem Button schwebt */
+    background-color: rgba(0, 191, 255, 0.2);         /* Hintergrund wird zu einem sehr transparenten Blau */
+    border-color: #33cfff;                            /* Der Rahmen wird etwas heller */
+    transform: translateY(-2px);                      /* Bewegt den Button 2px nach oben für einen leichten Schwebe-Effekt */
+    box-shadow: 0 4px 10px rgba(0, 191, 255, 0.3);     /* Fügt einen blauen Schatten hinzu, der den Schwebe-Effekt verstärkt */
+}
+
+
+/*
+--------------------------------------------------------------------------------
+| TEIL 5: RESPONSIVE ANPASSUNGEN (MEDIA QUERIES)                               |
+--------------------------------------------------------------------------------
+| ZWECK:                                                                       |
+| Dieser Block sorgt dafür, dass das Layout auf kleineren Bildschirmen (z.B.   |
+| Smartphones) gut aussieht und benutzbar bleibt. Die Stile hier werden nur    |
+| angewendet, wenn die Bildschirmbreite 768 Pixel oder weniger beträgt.        |
+--------------------------------------------------------------------------------
+*/
+
+@media (max-width: 768px) {
+    body {
+        padding: 10px;                                /* Reduziert den seitlichen Abstand auf kleinen Geräten */
+        padding-bottom: 100px;                        /* Behält den Abstand für die Navbar bei */
+    }
+
+    .section {
+        padding: 15px;                                /* Reduziert den Innenabstand der Sektionen */
+    }
+
+    .grid-container {
+        grid-template-columns: 1fr;                   /* Zwingt das Grid, immer nur eine Spalte zu haben, sodass die Karten untereinander gestapelt werden */
+    }
+}
+
+
+/* --- Iframe-Höhensteuerung für die Navigationsleiste --- */
+
+/* Standardhöhe für mobile Geräte (60px Leiste + etwas Puffer) */
+#main-navbar {
+    height: 70px;
+}
+
+/* Höhe für den Iframe auf dem Desktop anpassen (115px Leiste + Puffer) */
+@media (min-width: 768px) {
+    #main-navbar {
+        height: 125px;
+    }
+}

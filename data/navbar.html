@@ -1,0 +1,123 @@
+<!--
+================================================================================
+| AUTOR: M.Sc. Christian Kitzel, Hochschule Düsseldorf (HSD)                   |
+| LIZENZ: Proprietär - Siehe LICENSE.md für Details                            |
+| Copyright (c) 2025 M.Sc. Christian Kitzel, Hochschule Düsseldorf             |
+================================================================================
+-->
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        /* Grundlegende Stile, um sicherzustellen, dass der Iframe keinen eigenen Hintergrund hat */
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: transparent; /* Wichtig, damit der Seitenhintergrund durchscheint */
+        }
+
+        /* --- Navigationsleiste: Kompakt auf Mobilgeräten --- */
+        .nav-bar {
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 5px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 60px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            box-sizing: border-box; /* <-- HINZUFÜGEN */
+        }
+
+        .nav-bar a {
+            color: #ccc;                      /* Standardfarbe für Icons */
+            text-decoration: none;
+            display: flex;                    /* Flexbox für perfekte Zentrierung des Icons */
+            align-items: center;
+            justify-content: center;
+            width: 50px;                      /* Quadratische Button-Größe */
+            height: 50px;
+            border-radius: 50%;               /* Macht die Buttons rund */
+            transition: all 0.3s ease;        /* Sanfter Übergang für Hover- und Active-Effekte */
+        }
+
+        .nav-bar a i {
+            font-size: 19px;                  /* Icon-Größe für Mobilgeräte */
+        }
+
+        /* --- Interaktive Zustände --- */
+        .nav-bar a:hover {
+            background-color: rgba(0, 191, 255, 0.1); /* Leichter blauer Schimmer beim Hovern */
+            color: #fff;
+        }
+
+        .nav-bar a.active {
+            background-color: rgba(0, 191, 255, 0.15); /* Etwas stärkerer blauer Hintergrund für die aktive Seite */
+            color: #fff;
+            border: 1px solid #00bfff;        /* Blauer Rahmen zur Hervorhebung */
+        }
+
+        /* --- Responsive Anpassung für größere Bildschirme (Tablets/Desktops) --- */
+        @media (min-width: 768px) {
+            .nav-bar {
+                height: 115px;
+                padding: 10px;
+            }
+
+            .nav-bar a {
+                width: 85px;
+                height: 85px;
+                margin: 0 8px;
+                background-color: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                box-sizing: border-box; 
+            }
+
+            .nav-bar a i {
+                font-size: 40px;              /* Deutlich größere Icons */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="nav-bar">
+        <!-- Links angepasst an unsere Projektstruktur -->
+        <a href="/" target="_top"><i class="fas fa-home"></i></a> <!-- Link zur Startseite/Dashboard -->
+        <a href="/wifi.html" target="_top"><i class="fas fa-wifi"></i></a>       <!-- Link zur WLAN-Konfiguration -->
+        <a href="/system.html" target="_top"><i class="fas fa-heartbeat"></i></a> <!-- Link zur System-Diagnose -->
+        <a href="/settings.html" target="_top"><i class="fas fa-cog"></i></a> <!-- Link zur System-Einstellungen -->
+        <a href="control.html" class="nav-item">
+    <i class="fas fa-gamepad"></i>
+    <span>Steuerung</span>
+</a>
+    </div>
+
+    
+
+    <script>
+        // Dieses Skript sorgt dafür, dass der richtige Button als "aktiv" markiert wird.
+        document.addEventListener("DOMContentLoaded", function() {
+            // Ermittelt den Pfad der Hauptseite (außerhalb des Iframes).
+            const parentPath = window.top.location.pathname;
+            const navLinks = document.querySelectorAll('.nav-bar a');
+
+            navLinks.forEach(link => {
+                const linkPath = link.getAttribute('href');
+                // Prüft, ob der Link-Pfad mit dem Pfad der Hauptseite übereinstimmt.
+                // Die Sonderbehandlung für "/" und "/index.html" stellt sicher, dass die Startseite korrekt erkannt wird.
+                if (linkPath === parentPath || (parentPath === '/index.html' && linkPath === '/')) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

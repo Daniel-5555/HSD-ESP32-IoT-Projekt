@@ -1,0 +1,59 @@
+<!--
+================================================================================
+| AUTOR: M.Sc. Christian Kitzel, Hochschule Düsseldorf (HSD)                   |
+| LIZENZ: Proprietär - Siehe LICENSE.md für Details                            |
+| Copyright (c) 2025 M.Sc. Christian Kitzel, Hochschule Düsseldorf             |
+================================================================================
+-->
+
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Lade die zentrale CSS-Datei -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- Lade Font Awesome für Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title>Daniel</title>
+</head>
+<body>
+    <div class="section">
+        <h2><i class="fas fa-tachometer-alt"></i> Daniel</h2>
+        <div class="grid-container">
+            
+            <!-- Karte zur WLAN-Konfiguration -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-wifi"></i>
+                    <h3>Netzwerk</h3>
+                </div>
+                <p>Konfigurieren Sie die WLAN-Verbindung des Geräts, um es mit Ihrem Heimnetzwerk zu verbinden.</p>
+                <a href="/wifi.html" class="button" style="margin-top: auto;">Zur WLAN-Konfiguration</a>
+            </div>
+
+            <!-- Karte zur System-Diagnose -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-heartbeat"></i>
+                    <h3>System-Diagnose</h3>
+                </div>
+                <p>Überprüfen Sie den Zustand des Systems, inklusive Speicher, Laufzeit und Netzwerkstabilität.</p>
+                <a href="/system.html" class="button" style="margin-top: auto;">Zur Diagnose-Seite</a>
+            </div>
+
+            <!-- Karte für die Einstellungen -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-cogs"></i>
+                    <h3>Einstellungen</h3>
+                </div>
+                <p>Führen Sie Firmware-Updates durch, starten Sie das Gerät neu oder konfigurieren Sie weitere Systemparameter.</p>
+                <a href="/settings.html" class="button" style="margin-top: auto;">Zu den Einstellungen</a>
+            </div>
+
+        </div>
+    </div>
+    <iframe id="main-navbar" src="navbar.html" style="position: fixed; bottom: 0; left: 0; width: 100%; border: none; z-index: 1000; display: block;"></iframe></body>
+</html>

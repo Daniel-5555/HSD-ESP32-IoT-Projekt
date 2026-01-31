@@ -1,0 +1,211 @@
+<!--
+================================================================================
+| AUTOR: M.Sc. Christian Kitzel, Hochschule Düsseldorf (HSD)                   |
+| LIZENZ: Proprietär - Siehe LICENSE.md für Details                            |
+| Copyright (c) 2025 M.Sc. Christian Kitzel, Hochschule Düsseldorf             |
+================================================================================
+-->
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Link zur zentralen, ausgelagerten CSS-Datei -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- Link zu Font Awesome für die Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title>System-Diagnose</title>
+</head>
+<body>
+    <!-- Der Body ist identisch zu Ihrer Vorlage. Er wird hier zur Vollständigkeit eingefügt. -->
+    <div class="section">
+        <h2><i class="fas fa-heartbeat"></i> System-Diagnose</h2>
+        <div class="grid-container">
+            <!-- Stabilitäts-Karte -->
+            <div class="card">
+                <div class="card-header"><i class="fas fa-shield-alt"></i><h3>Stabilität</h3></div>
+                <div class="info-grid">
+                    <div class="label">Letzter Neustart:</div><div class="value"><span id="reset-reason">-</span></div>
+                    <div class="label">Laufzeit:</div><div class="value"><span id="sys-uptime">-</span></div>
+                </div>
+                <div class="explanation">
+                    <p><span id="reset-dot" class="status-dot"></span><strong id="reset-status-text">Wird geladen...</strong></p>
+                    <p>Der Neustart-Grund gibt einen schnellen Überblick über die Stabilität. "Watchdog" oder "Panic" deuten auf einen Software-Absturz hin.</p>
+                </div>
+            </div>
+            <!-- Heap-Speicher-Karte -->
+            <div class="card">
+                <div class="card-header"><i class="fas fa-memory"></i><h3>Heap-Speicher [RAM]</h3></div>
+                <div class="info-grid">
+                    <div class="label">Aktuell Frei:</div><div class="value"><span id="heap-free">-</span></div>
+                    <div class="label">Tiefststand Frei:</div><div class="value"><span id="heap-min">-</span></div>
+                    <div class="label">Gesamt:</div><div class="value"><span id="heap-total">-</span></div>
+                </div>
+                <div class="progress-bar"><div id="heap-progress" class="progress-fill"></div></div>
+                <div class="explanation">
+                    <p><span id="heap-dot" class="status-dot"></span><strong id="heap-status-text">Wird geladen...</strong></p>
+                    <p>Fällt der freie Speicher unter 15%, drohen Abstürze. Der Tiefststand ist der kritischste Wert.</p>
+                </div>
+            </div>
+            <!-- Netzwerk-Karte -->
+            <div class="card">
+                <div class="card-header"><i class="fas fa-wifi"></i><h3>Netzwerk-Zuverlässigkeit</h3></div>
+                <div class="info-grid">
+                    <div class="label">SSID:</div><div class="value"><span id="wifi-ssid">-</span></div>
+                    <div class="label">Signal (RSSI):</div><div class="value"><span id="wifi-rssi">-</span></div>
+                    <div class="label">IP-Adresse:</div><div class="value"><span id="wifi-ip">-</span></div>
+                    <div class="label">Letzte Zeit-Sync:</div><div class="value"><span id="time-sync">-</span></div>
+                </div>
+                <div class="explanation">
+                    <p><span id="wifi-dot" class="status-dot"></span><strong id="wifi-status-text">Wird geladen...</strong></p>
+                    <p>Ein Signal unter -80 dBm deutet auf ein instabiles WLAN hin.</p>
+                </div>
+            </div>
+            <!-- System-ID-Karte -->
+            <div class="card">
+                <div class="card-header"><i class="fas fa-microchip"></i><h3>System-Identifikation</h3></div>
+                <div class="info-grid">
+                    <div class="label">Firmware:</div><div class="value"><span id="sys-version">-</span></div>
+                    <div class="label">MAC-Adresse:</div><div class="value"><span id="sys-mac">-</span></div>
+                    <div class="label">CPU Temp:</div><div class="value"><span id="sys-cputemp">-</span></div>
+                </div>
+                <div class="explanation">
+                    <p><span id="temp-dot" class="status-dot"></span><strong id="temp-status-text">Wird geladen...</strong></p>
+                    <p>Die MAC-Adresse ist die eindeutige ID des Geräts. CPU-Temp > 80°C ist kritisch.</p>
+                </div>
+            </div>
+            <!-- Log-Karte -->
+            <div class="card">
+                <div class="card-header"><i class="fas fa-clipboard-list"></i><h3>System-Logs</h3></div>
+                <div class="log-container" id="logContent">Logs werden geladen...</div>
+                <div class="button-row">
+                    <button class="button" onclick="refreshLogs()">Logs aktualisieren</button>
+                    <button class="button danger-button" onclick="clearLogs()">Logs löschen</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function formatBytes(bytes, decimals = 2) {
+            if (!+bytes) return "0 Bytes";
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ["Bytes", "KB", "MB", "GB"];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+        }
+
+        function formatUptime(seconds) {
+            const d = Math.floor(seconds / 86400); seconds %= 86400;
+            const h = Math.floor(seconds / 3600); seconds %= 3600;
+            const m = Math.floor(seconds / 60);
+            const s = seconds % 60;
+            let str = "";
+            if (d > 0) str += `${d}d `;
+            if (h > 0) str += `${h}h `;
+            if (m > 0) str += `${m}m `;
+            str += `${s}s`;
+            return str.trim();
+        }
+
+        function formatTime(unixTimestamp) {
+            if (!unixTimestamp || unixTimestamp === 0) return "Noch nicht erfolgt";
+            const date = new Date(unixTimestamp * 1000);
+            return date.toLocaleString("de-DE");
+        }
+
+        function updateUI(data) {
+            // Heap
+            const heapUsed = data.heap_total - data.heap_free;
+            const heapUsedPercent = Math.round(heapUsed / data.heap_total * 100);
+            const minHeapFreePercent = Math.round(data.heap_min_free / data.heap_total * 100);
+            document.getElementById("heap-free").textContent = `${formatBytes(data.heap_free, 0)} (${100 - heapUsedPercent}%)`;
+            document.getElementById("heap-min").textContent = `${formatBytes(data.heap_min_free, 0)} (${minHeapFreePercent}%)`;
+            document.getElementById("heap-total").textContent = formatBytes(data.heap_total, 0);
+            const heapProgress = document.getElementById("heap-progress"), heapDot = document.getElementById("heap-dot"), heapStatus = document.getElementById("heap-status-text");
+            heapProgress.style.width = heapUsedPercent + "%";
+            if (minHeapFreePercent > 25) { heapProgress.className = "progress-fill good"; heapDot.className = "status-dot good"; heapStatus.textContent = "Optimal"; }
+            else if (minHeapFreePercent > 15) { heapProgress.className = "progress-fill warning"; heapDot.className = "status-dot warning"; heapStatus.textContent = "Akzeptabel"; }
+            else { heapProgress.className = "progress-fill critical"; heapDot.className = "status-dot critical"; heapStatus.textContent = "Kritisch!"; }
+
+            // Netzwerk
+            document.getElementById("wifi-ssid").textContent = data.wifi_ssid;
+            document.getElementById("wifi-rssi").textContent = data.wifi_rssi + " dBm";
+            document.getElementById("wifi-ip").textContent = data.ip_address;
+            document.getElementById("time-sync").textContent = formatTime(data.last_time_sync);
+            const rssi = data.wifi_rssi, wifiDot = document.getElementById("wifi-dot"), wifiStatus = document.getElementById("wifi-status-text");
+            if (rssi > -67 && data.wifi_ssid !== "Nicht verbunden") { wifiDot.className = "status-dot good"; wifiStatus.textContent = "Signal Exzellent"; }
+            else if (rssi > -80 && data.wifi_ssid !== "Nicht verbunden") { wifiDot.className = "status-dot warning"; wifiStatus.textContent = "Signal Schwach"; }
+            else { wifiDot.className = "status-dot critical"; wifiStatus.textContent = "Signal Kritisch / Getrennt"; }
+
+            // System
+            document.getElementById("sys-version").textContent = data.firmware_version;
+            document.getElementById("sys-mac").textContent = data.mac_address;
+            const temp = data.cpu_temp, tempDot = document.getElementById("temp-dot"), tempStatus = document.getElementById("temp-status-text");
+            if (temp && temp > 0) {
+                document.getElementById("sys-cputemp").textContent = temp.toFixed(1) + " °C";
+                if (temp < 60) { tempDot.className = "status-dot good"; tempStatus.textContent = "Optimal"; }
+                else if (temp < 80) { tempDot.className = "status-dot warning"; tempStatus.textContent = "Erhöht"; }
+                else { tempDot.className = "status-dot critical"; tempStatus.textContent = "Kritisch!"; }
+            } else { document.getElementById("sys-cputemp").textContent = "N/A"; }
+
+            // Stabilität
+            document.getElementById("reset-reason").textContent = data.reset_reason_text;
+            document.getElementById("sys-uptime").textContent = formatUptime(data.uptime_seconds);
+            const reason = data.reset_reason_code, resetDot = document.getElementById("reset-dot"), resetStatus = document.getElementById("reset-status-text");
+            switch (reason) {
+                case 1: case 3: resetDot.className = "status-dot info"; resetStatus.textContent = "Normaler Start"; break;
+                case 10: resetDot.className = "status-dot warning"; resetStatus.textContent = "Stromproblem erkannt"; break;
+                default: resetDot.className = "status-dot critical"; resetStatus.textContent = "System-Absturz!"; break;
+            }
+        }
+
+        async function fetchData() {
+        try {
+            const response = await fetch("/api/system/health");
+            if (!response.ok) throw new Error("Network response was not ok " + response.statusText);
+            const data = await response.json();
+            updateUI(data);
+        } catch (error) {
+            console.error("Fehler beim Laden der Systemdaten:", error);
+        }
+    }
+
+    async function refreshLogs() {
+        try {
+            const response = await fetch('/api/logs');
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const data = await response.text();
+            const logContent = document.getElementById('logContent');
+            if (logContent) {
+                logContent.textContent = data;
+                logContent.scrollTop = logContent.scrollHeight;
+            }
+        } catch (error) {
+            console.error('Log-Abruf Fehler:', error);
+            document.getElementById('logContent').textContent = "Fehler beim Laden der Logs.";
+        }
+    }
+
+    async function clearLogs() {
+        if (!confirm('Möchten Sie wirklich alle Logs löschen?')) return;
+        try {
+            const response = await fetch('/api/logs/clear', { method: 'POST' });
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            refreshLogs();
+        } catch (error) {
+            console.error('Log-Löschung Fehler:', error);
+            alert('Fehler beim Löschen der Logs.');
+        }
+    }
+
+    window.addEventListener("load", () => {
+        fetchData();
+        refreshLogs(); // Lade die Logs beim Start
+        setInterval(fetchData, 5000);
+    });
+</script>
+<iframe id="main-navbar" src="navbar.html" style="position: fixed; bottom: 0; left: 0; width: 100%; border: none; z-index: 1000; display: block;"></iframe></body>
+</html>

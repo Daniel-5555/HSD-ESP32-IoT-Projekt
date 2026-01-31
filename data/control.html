@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roboter Steuerung</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Zusätzliche Styles für die Steuerung */
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            max-width: 300px;
+            margin: 20px auto;
+        }
+        .btn-control {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-control:active {
+            background-color: #0056b3;
+        }
+        .btn-toggle {
+            background-color: #dc3545; /* Rot für OFF */
+        }
+        .btn-toggle.active {
+            background-color: #28a745; /* Grün für ON */
+        }
+        .slider-container {
+            margin-top: 20px;
+            text-align: left;
+            padding: 10px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+        }
+        .slider-container label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .slider-input {
+            width: 100%;
+            -webkit-appearance: none;
+            height: 10px;
+            border-radius: 5px;
+            background: #d3d3d3;
+            outline: none;
+            opacity: 0.7;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+        }
+        .slider-input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #007bff;
+            cursor: pointer;
+        }
+        .slider-input::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #007bff;
+            cursor: pointer;
+        }
+        .status-display {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .status-item {
+            text-align: center;
+            padding: 10px;
+            min-width: 80px;
+        }
+        .status-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .status-label {
+            font-size: 0.8em;
+            color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-robot"></i> Mission Control</h1>
+        </header>
+
+        <div class="content">
+            <div class="card" style="text-align: center; padding: 20px;">
+                <h2>Roboter Status</h2>
+                <div class="status-display">
+                    <div class="status-item">
+                        <div id="statusAngle" class="status-value">0.0</div>
+                        <div class="status-label">Winkel (°)<br>(Filter)</div>
+                    </div>
+                    <div class="status-item">
+                        <div id="statusError" class="status-value">0.0</div>
+                        <div class="status-label">Fehler (°)<br>(Soll-Ist)</div>
+                    </div>
+                    <div class="status-item">
+                        <div id="statusGyro" class="status-value">0.0</div>
+                        <div class="status-label">Drehrate (°/s)<br>(Gyro)</div>
+                    </div>
+                    <div class="status-item">
+                        <div id="statusMotor" class="status-value">0</div>
+                        <div class="status-label">Motor<br>(PWM)</div>
+                    </div>
+                    <div class="status-item">
+                        <div id="statusEnabled" class="status-value">OFF</div>
+                        <div class="status-label">Motoren<br>(Status)</div>
+                    </div>
+                </div>
+
+                <h2 style="margin-top: 30px;">Manuelle Steuerung</h2>
+                <p>Nutze die Buttons für die Bewegung.</p>
+                
+                <div class="control-grid">
+                    <div></div>
+                    <button id="btnUp" onmousedown="startMove(100, 0)" onmouseup="stopMove()" ontouchstart="startMove(100, 0)" ontouchend="stopMove()" class="btn-control">⬆️ Vorwärts</button>
+                    <div></div>
+
+                    <button id="btnLeft" onmousedown="startMove(0, 100)" onmouseup="stopMove()" ontouchstart="startMove(0, 100)" ontouchend="stopMove()" class="btn-control">⬅️ Links</button>
+                    <button id="btnToggleMotors" onclick="toggleRobotMotors()" class="btn-control btn-toggle">OFF</button>
+                    <button id="btnRight" onmousedown="startMove(0, -100)" onmouseup="stopMove()" ontouchstart="startMove(0, -100)" ontouchend="stopMove()" class="btn-control">➡️ Rechts</button>
+
+                    <div></div>
+                    <button id="btnDown" onmousedown="startMove(-100, 0)" onmouseup="stopMove()" ontouchstart="startMove(-100, 0)" ontouchend="stopMove()" class="btn-control">⬇️ Rückwärts</button>
+                    <div></div>
+                </div>
+
+                <h2 style="margin-top: 30px;">PID Tuning</h2>
+                <div class="slider-container">
+                    <label for="kpSlider">Kp: <span id="kpValue">3.0</span></label>
+                    <input type="range" id="kpSlider" min="0" max="10.0" step="0.01" value="3.0" class="slider-input">
+                    
+                    <label for="kiSlider">Ki: <span id="kiValue">0.005</span></label>
+                    <input type="range" id="kiSlider" min="0" max="0.1" step="0.001" value="0.005" class="slider-input">
+                    
+                    <label for="kdSlider">Kd: <span id="kdValue">0.3</span></label>
+                    <input type="range" id="kdSlider" min="0" max="5.0" step="0.01" value="0.3" class="slider-input">
+
+                    <button onclick="sendPidValues()" class="btn-control" style="width: 100%; margin-top: 15px;">PID Werte senden</button>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="navbar-placeholder"></div>
+    </div>
+
+    <script>
+        let moveX = 0;
+        let moveY = 0;
+        let motorsOn = false; // Initialer Status
+        let movementIntervalId;
+        let statusFetchIntervalId;
+
+        // Lädt die Navbar
+        fetch('navbar.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('navbar-placeholder').innerHTML = data;
+                const links = document.querySelectorAll('.nav-item');
+                links.forEach(link => {
+                    if(link.getAttribute('href') === 'control.html') {
+                        link.classList.add('active');
+                    }
+                });
+            })
+            .catch(error => console.error('Error loading navbar:', error));
+
+        // Startet kontinuierliche Bewegung bei gedrücktem Button
+        function startMove(x, y) {
+            if (!motorsOn) return; 
+            moveX = x;
+            moveY = y;
+            sendMovementCommand();
+            if (!movementIntervalId) {
+                movementIntervalId = setInterval(sendMovementCommand, 150); // Alle 150ms senden
+            }
+        }
+
+        // Stoppt Bewegung bei Loslassen des Buttons
+        function stopMove() {
+            moveX = 0;
+            moveY = 0;
+            sendMovementCommand();
+            clearInterval(movementIntervalId);
+            movementIntervalId = null;
+        }
+
+        // Sendet den Bewegungsbefehl an den ESP32
+        function sendMovementCommand() {
+            fetch(`/api/robot/move?x=${moveX}&y=${moveY}`, { method: 'POST' })
+                .then(response => response.text())
+                .then(data => console.log('Move command sent:', data))
+                .catch(error => console.error('Error sending move command:', error));
+        }
+
+        // Schaltet Motoren AN/AUS
+        function toggleRobotMotors() {
+            motorsOn = !motorsOn;
+            const cmd = motorsOn ? 'enable' : 'disable';
+            fetch(`/api/robot/move?cmd=${cmd}`, { method: 'POST' })
+                .then(response => response.text())
+                .then(data => {
+                    console.log('Toggle motors:', data);
+                    updateMotorToggleButton();
+                    // Wenn Motoren deaktiviert werden, Bewegung stoppen
+                    if (!motorsOn) {
+                        stopMove();
+                    }
+                })
+                .catch(error => console.error('Error toggling motors:', error));
+        }
+
+        // Aktualisiert den Zustand des Motor-Buttons
+        function updateMotorToggleButton() {
+            const btn = document.getElementById('btnToggleMotors');
+            if (btn) {
+                btn.textContent = motorsOn ? 'ON' : 'OFF';
+                btn.classList.toggle('active', motorsOn);
+            }
+        }
+
+        // Sendet die PID-Werte an den ESP32
+        function sendPidValues() {
+            const kp = document.getElementById('kpSlider').value;
+            const ki = document.getElementById('kiSlider').value;
+            const kd = document.getElementById('kdSlider').value;
+            fetch(`/api/robot/pid`, { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `kp=${kp}&ki=${ki}&kd=${kd}`
+            })
+            .then(response => response.text())
+            .then(data => console.log('PID values sent:', data))
+            .catch(error => console.error('Error sending PID values:', error));
+        }
+
+        // Aktualisiert die Anzeige der Slider-Werte
+        document.getElementById('kpSlider').oninput = function() {
+            document.getElementById('kpValue').textContent = parseFloat(this.value).toFixed(2);
+        };
+        document.getElementById('kiSlider').oninput = function() {
+            document.getElementById('kiValue').textContent = parseFloat(this.value).toFixed(3);
+        };
+        document.getElementById('kdSlider').oninput = function() {
+            document.getElementById('kdValue').textContent = parseFloat(this.value).toFixed(2);
+        };
+
+        // Ruft den aktuellen Roboterstatus ab und aktualisiert das UI
+        function fetchRobotStatus() {
+            fetch('/api/robot/status')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('statusAngle').textContent = data.angle.toFixed(1);
+                    document.getElementById('statusError').textContent = data.error.toFixed(1);
+                    document.getElementById('statusGyro').textContent = data.gyro.toFixed(2);
+                    document.getElementById('statusMotor').textContent = data.motor;
+                    document.getElementById('statusEnabled').textContent = data.enabled ? 'ON' : 'OFF';
+                    
+                    // Aktuellen Motorstatus vom Roboter übernehmen
+                    motorsOn = data.enabled;
+                    updateMotorToggleButton();
+
+                    // PID Slider-Werte vom Roboter übernehmen
+                    document.getElementById('kpSlider').value = data.kp; // Annahme: Kp, Ki, Kd kommen jetzt auch vom Status-API
+                    document.getElementById('kpValue').textContent = parseFloat(data.kp).toFixed(2);
+                    document.getElementById('kiSlider').value = data.ki;
+                    document.getElementById('kiValue').textContent = parseFloat(data.ki).toFixed(3);
+                    document.getElementById('kdSlider').value = data.kd;
+                    document.getElementById('kdValue').textContent = parseFloat(data.kd).toFixed(2);
+
+                })
+                .catch(error => {
+                    console.error('Error fetching robot status:', error);
+                    // UI als nicht verbunden anzeigen
+                    document.getElementById('statusAngle').textContent = '--';
+                    document.getElementById('statusError').textContent = '--';
+                    document.getElementById('statusGyro').textContent = '--';
+                    document.getElementById('statusMotor').textContent = '--';
+                    document.getElementById('statusEnabled').textContent = 'OFFLINE';
+                    motorsOn = false;
+                    updateMotorToggleButton();
+                });
+        }
+
+        // Initialisiert die UI und startet das Polling
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchRobotStatus(); // Sofort einmal abrufen
+            statusFetchIntervalId = setInterval(fetchRobotStatus, 500); // Alle 500ms aktualisieren
+            updateMotorToggleButton(); // Initialen Button-Text setzen
+            
+            // Slider-Werte initial anzeigen
+            document.getElementById('kpValue').textContent = parseFloat(document.getElementById('kpSlider').value).toFixed(2);
+            document.getElementById('kiValue').textContent = parseFloat(document.getElementById('kiSlider').value).toFixed(3);
+            document.getElementById('kdValue').textContent = parseFloat(document.getElementById('kdSlider').value).toFixed(2);
+        });
+    </script>
+</body>
+</html>

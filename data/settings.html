@@ -1,0 +1,90 @@
+<!--
+================================================================================
+| AUTOR: M.Sc. Christian Kitzel, Hochschule Düsseldorf (HSD)                   |
+| LIZENZ: Proprietär - Siehe LICENSE.md für Details                            |
+| Copyright (c) 2025 M.Sc. Christian Kitzel, Hochschule Düsseldorf             |
+================================================================================
+-->
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Lade die zentrale CSS-Datei -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- Lade Font Awesome für Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title>Einstellungen - ESP32</title>
+</head>
+<body>
+    <div class="section">
+        <h2><i class="fas fa-cogs"></i> Einstellungen</h2>
+        <div class="grid-container">
+            
+            <!-- Karte für OTA-Updates -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h3>Firmware & Dateisystem Update</h3>
+                </div>
+                <p>Laden Sie hier eine neue Firmware (.bin) oder ein neues Dateisystem-Image (.bin) hoch, um das Gerät zu aktualisieren. Das Gerät wird nach dem Update automatisch neu gestartet.</p>
+                
+                <a href="/update.html" class="button" style="margin-top: auto;">Update-Seite öffnen</a>
+            </div>
+
+            <!-- Karte für einen Neustart des Geräts -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-power-off"></i>
+                    <h3>Gerät neustarten</h3>
+                </div>
+                <p>Führt einen sauberen Neustart des ESP32 durch. Alle nicht gespeicherten Änderungen gehen dabei verloren.</p>
+                
+                <!-- Button, der den Neustart auslöst -->
+                <button class="button" style="background-color: rgba(255, 193, 7, 0.2); border-color: var(--warning-color);" onclick="rebootDevice()">
+                    Gerät jetzt neustarten
+                </button>
+            </div>
+
+            <!-- Platzhalter für zukünftige Einstellungen -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-sliders-h"></i>
+                    <h3>Weitere Optionen</h3>
+                </div>
+                <p>Dieser Bereich kann für zukünftige Konfigurationen wie MQTT-Einstellungen, API-Schlüssel oder andere gerätespezifische Parameter genutzt werden.</p>
+                <a href="#" class="button" style="margin-top: auto; background-color: #555; border-color: #777;">Demnächst verfügbar</a>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Navigationsleiste am unteren Rand -->
+    <iframe id="main-navbar" src="navbar.html" style="position: fixed; bottom: 0; left: 0; width: 100%; border: none; z-index: 1000; display: block;"></iframe>
+
+    <script>
+        // JavaScript-Funktion für den Neustart-Button
+        function rebootDevice() {
+            // Frage den Benutzer zur Sicherheit, ob er wirklich neustarten möchte
+            if (confirm("Möchten Sie den ESP32 wirklich neustarten?")) {
+                // Sende eine Anfrage an einen (noch zu erstellenden) API-Endpunkt
+                fetch('/api/system/reboot', { method: 'POST' })
+                    .then(response => {
+                        if (response.ok) {
+                            alert("Neustart wird eingeleitet. Die Verbindung wird kurz unterbrochen.");
+                            // Optional: Versuche nach ein paar Sekunden, die Seite neu zu laden
+                            setTimeout(() => window.location.reload(), 5000);
+                        } else {
+                            alert("Fehler: Der Neustart konnte nicht eingeleitet werden.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert("Kommunikationsfehler beim Versuch, das Gerät neuzustarten.");
+                    });
+            }
+        }
+    </script>
+</body>
+</html>
